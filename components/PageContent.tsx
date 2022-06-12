@@ -4,7 +4,7 @@ export interface PageContentProps {
 
 export default function PageContent({children}: PageContentProps) {
   return (
-    <main className="">
+    <main style={{width: "70%", margin: "auto"}}>
       {children}
     </main>
   )

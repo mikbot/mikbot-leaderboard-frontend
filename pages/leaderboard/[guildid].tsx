@@ -12,10 +12,29 @@ import React from "react"
 import Head from "next/head";
 
 export interface GuildLeaderboardProps {
-  leaderboard: Leaderboard
+  leaderboard?: Leaderboard
 }
 
 export default function GuildLeaderboardPage({leaderboard}: GuildLeaderboardProps) {
+  if (!leaderboard) {
+    return (
+      <>
+        <Head>
+          <title>No Leaderboard found</title>
+          <meta name="description" content={`There was no Leaderboard found for the given id`}/>
+          <meta property="og:title" content={"No Leaderboard found"}/>
+          <meta name="og:description" content={`There was no Leaderboard found for the given id`}/>
+        </Head>
+        <PageHolder>
+          <PageTitle>404 - Not Found</PageTitle>
+          <PageContent>
+            <Text>There was no Leaderboard found for that ID</Text>
+          </PageContent>
+        </PageHolder>
+      </>
+    )
+  }
+
   return (
     <>
       <Head>
@@ -27,34 +46,36 @@ export default function GuildLeaderboardPage({leaderboard}: GuildLeaderboardProp
       <PageHolder>
         <PageTitle>Leaderboard for {leaderboard.guild_name}</PageTitle>
         <PageContent>
-          <Card radius="md" style={{width: "70%", margin: "auto", overflow: "auto"}} px="xl">
-            {leaderboard.members.map((member, index, array) => {
-              return (
-                <React.Fragment key={member.user_id}>
-                  <div style={{display: "inline-flex", width: "100%", minWidth: "70vh"}}>
-                    <UserPosition position={index + 1}/>
-                    <Space w="md"/>
-                    <LeaderboardAvatar avatarUrl={member.avatar_url}/>
-                    <Space w="md"/>
-                    <LeaderboardName>
-                      <Title order={2} style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>{member.username}</Title>
-                      <Text>#{member.discriminator}</Text>
-                    </LeaderboardName>
-                    <Space w="xl"/>
-                    <LevelDisplay member={member}/>
-                  </div>
-                  {array.length - 1 > (index) &&
-                    (
-                      <>
-                        <Space h="md"/>
-                        <Divider style={{width: "100%", minWidth: "70vh"}}/>
-                        <Space h="md"/>
-                      </>
-                    )
-                  }
-                </React.Fragment>
-              )
-            })}
+          <Card radius="md" style={{overflow: "auto"}} px="xl">
+            {leaderboard.members
+              .filter(value => value.username)
+              .map((member, index, array) => {
+                return (
+                  <React.Fragment key={member.user_id}>
+                    <div style={{display: "inline-flex", width: "100%", minWidth: "70vh"}}>
+                      <UserPosition position={index + 1}/>
+                      <Space w="md"/>
+                      <LeaderboardAvatar avatarUrl={member.avatar_url}/>
+                      <Space w="md"/>
+                      <LeaderboardName>
+                        <Title order={2} style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>{member.username}</Title>
+                        <Text>#{member.discriminator}</Text>
+                      </LeaderboardName>
+                      <Space w="xl"/>
+                      <LevelDisplay member={member}/>
+                    </div>
+                    {array.length - 1 > (index) &&
+                      (
+                        <>
+                          <Space h="md"/>
+                          <Divider style={{width: "100%", minWidth: "70vh"}}/>
+                          <Space h="md"/>
+                        </>
+                      )
+                    }
+                  </React.Fragment>
+                )
+              })}
           </Card>
         </PageContent>
       </PageHolder>
@@ -66,11 +87,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const baseUrl = process.env.API_BASE_URL
   const {guildid} = context.query
 
-  const response = await (await fetch(`${baseUrl}/leaderboard/guilds/${guildid}`)).json()
+  const response = await fetch(`${baseUrl}/leaderboard/guilds/${guildid}`)
+  if (response.status !== 200) {
+    return {props: {leaderboard: null}}
+  }
 
   return {
     props: {
-      leaderboard: response
+      leaderboard: await response.json()
     }
   }
 }

@@ -3,7 +3,7 @@ import {GetServerSideProps} from "next";
 import PageHolder from "../../components/PageHolder";
 import PageTitle from "../../components/PageTitle";
 import PageContent from "../../components/PageContent";
-import {Card, Divider, Space, Text, Title} from "@mantine/core";
+import {Avatar, Card, Divider, Space, Text, Title} from "@mantine/core";
 import UserPosition from "../../components/leaderboard/UserPosition";
 import LeaderboardAvatar from "../../components/leaderboard/LeaderboardAvatar";
 import LeaderboardName from "../../components/leaderboard/LeaderboardName";
@@ -26,7 +26,7 @@ export default function GuildLeaderboardPage({leaderboard}: GuildLeaderboardProp
           <meta name="og:description" content={`There was no Leaderboard found for the given id`}/>
         </Head>
         <PageHolder>
-          <PageTitle>404 - Not Found</PageTitle>
+          <PageTitle><Title>404 - Not Found</Title></PageTitle>
           <PageContent>
             <Text>There was no Leaderboard found for that ID</Text>
           </PageContent>
@@ -44,7 +44,13 @@ export default function GuildLeaderboardPage({leaderboard}: GuildLeaderboardProp
         <meta name="og:description" content={`Mikbot-Level-Leaderboard for ${leaderboard.guild_name}`}/>
       </Head>
       <PageHolder>
-        <PageTitle>Leaderboard for {leaderboard.guild_name}</PageTitle>
+        <PageTitle>
+          <div style={{display: "inline-flex"}}>
+            <Avatar style={{alignSelf: "center"}} src={leaderboard.guild_icon} alt={leaderboard.guild_name} radius="lg" size="lg"/>
+            <Space w="xl" />
+            <Title style={{alignSelf: "center"}}>Leaderboard for {leaderboard.guild_name}</Title>
+          </div>
+        </PageTitle>
         <PageContent>
           <Card radius="md" style={{overflow: "auto"}} px="xl">
             {leaderboard.members

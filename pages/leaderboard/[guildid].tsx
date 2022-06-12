@@ -46,15 +46,15 @@ export default function GuildLeaderboardPage({leaderboard}: GuildLeaderboardProp
       <PageHolder>
         <PageTitle>
           <div style={{display: "inline-flex"}}>
-            <Avatar style={{alignSelf: "center"}} src={leaderboard.guild_icon} alt={leaderboard.guild_name} radius="lg" size="lg"/>
-            <Space w="xl" />
+            <Avatar style={{alignSelf: "center"}} src={leaderboard.guild_icon} alt={leaderboard.guild_name} radius="lg"
+                    size="lg"/>
+            <Space w="xl"/>
             <Title style={{alignSelf: "center"}}>Leaderboard for {leaderboard.guild_name}</Title>
           </div>
         </PageTitle>
         <PageContent>
           <Card radius="md" style={{overflow: "auto"}} px="xl">
             {leaderboard.members
-              .filter(value => value.username)
               .map((member, index, array) => {
                 return (
                   <React.Fragment key={member.user_id}>
@@ -64,8 +64,19 @@ export default function GuildLeaderboardPage({leaderboard}: GuildLeaderboardProp
                       <LeaderboardAvatar avatarUrl={member.avatar_url}/>
                       <Space w="md"/>
                       <LeaderboardName>
-                        <Title order={2} style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>{member.username}</Title>
-                        <Text>#{member.discriminator}</Text>
+                        {member.username ? (
+                          <>
+                            <Title order={2}
+                                   style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>{member.username}</Title>
+                            <Text>#{member.discriminator}</Text>
+                          </>
+                        ) : (
+                          <>
+                            <Title order={2} style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>
+                              Unknown User
+                            </Title>
+                          </>
+                        )}
                       </LeaderboardName>
                       <Space w="xl"/>
                       <LevelDisplay member={member}/>

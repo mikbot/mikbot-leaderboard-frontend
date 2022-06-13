@@ -7,7 +7,7 @@ import {Avatar, Card, Divider, Space, Text, Title} from "@mantine/core";
 import UserPosition from "../../components/leaderboard/UserPosition";
 import LeaderboardAvatar from "../../components/leaderboard/LeaderboardAvatar";
 import LeaderboardName from "../../components/leaderboard/LeaderboardName";
-import LevelDisplay from "../../components/leaderboard/LevelDisplay";
+import LevelDisplay, {calculateXPForLevel} from "../../components/leaderboard/LevelDisplay";
 import React from "react"
 import Head from "next/head";
 
@@ -64,19 +64,11 @@ export default function GuildLeaderboardPage({leaderboard}: GuildLeaderboardProp
                       <LeaderboardAvatar avatarUrl={member.avatar_url}/>
                       <Space w="md"/>
                       <LeaderboardName>
-                        {member.username ? (
-                          <>
-                            <Title order={2}
-                                   style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>{member.username}</Title>
-                            <Text>#{member.discriminator}</Text>
-                          </>
-                        ) : (
-                          <>
-                            <Title order={2} style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>
-                              Unknown User
-                            </Title>
-                          </>
-                        )}
+                        <>
+                          <Title order={2}
+                                 style={{maxWidth: "50vh", overflowWrap: "anywhere"}}>{member.username}</Title>
+                          <Text>#{member.discriminator}</Text>
+                        </>
                       </LeaderboardName>
                       <Space w="xl"/>
                       <LevelDisplay member={member}/>
@@ -109,9 +101,32 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {props: {leaderboard: null}}
   }
 
+  const leaderboard = (await response.json()) as Leaderboard
+
+  const members = leaderboard.members
+
+  for (const value of members) {
+    if (!value.username) {
+      value.username = "Unknown User"
+      value.discriminator = "0000"
+    }
+
+    if (value.avatar_url) {
+      value.avatar_url += "?size=80"
+    }
+
+    value.points = calculateXPForLevel(value.level) + value.points
+  }
+
   return {
     props: {
-      leaderboard: await response.json()
+      leaderboard: {
+        guild_name: leaderboard.guild_name,
+        guild_icon: leaderboard.guild_icon,
+        members: members.sort((a, b) => {
+          return b.points - a.points
+        })
+      }
     }
   }
 }

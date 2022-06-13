@@ -10,7 +10,7 @@ export default function LevelDisplay({member}: LevelDisplayProps) {
     <>
       <div style={{display: "flex", marginLeft: "auto", flexDirection: "column"}}>
         <Title order={4} style={{alignSelf: "center"}}>Points</Title>
-        <Text size="xl" style={{alignSelf: "center", margin: "auto"}}>{member.points}</Text>
+        <Text size="xl" style={{alignSelf: "center", margin: "auto"}}>{calculateXPForLevel(member.level) + member.points}</Text>
       </div>
       <Space w="xl"/>
       <div style={{display: "flex", flexDirection: "column"}}>
@@ -31,18 +31,19 @@ export default function LevelDisplay({member}: LevelDisplayProps) {
   )
 }
 
-function calculateCompletionPercentage(level: number, currentXp: number): number {
-  function calculateXPForLevel(level: number): number {
-    let acc = 0
-    for (let i = 0; i < level; i++) {
-      acc += calculateXPNeededForNextLevel(i)
-    }
-    return acc
+export function calculateXPForLevel(level: number): number {
+  let acc = 0
+  for (let i = 0; i < level; i++) {
+    acc += calculateXPNeededForNextLevel(i)
   }
+  return acc
+}
 
-  function calculateXPNeededForNextLevel(level: number): number {
-    return 5 * (Math.pow(level, 2)) + 50 * level + 100
-  }
+function calculateXPNeededForNextLevel(level: number): number {
+  return 5 * (Math.pow(level, 2)) + 50 * level + 100
+}
+
+function calculateCompletionPercentage(level: number, currentXp: number): number {
 
   return (currentXp / calculateXPForLevel(level + 1)) * 100
 }

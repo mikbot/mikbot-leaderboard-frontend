@@ -5,5 +5,12 @@ export interface LeaderboardAvatarProps {
 }
 
 export default function LeaderboardAvatar({avatarUrl}: LeaderboardAvatarProps) {
-  return <Avatar src={avatarUrl} alt="profile picture" style={{alignSelf: "center"}} size="lg" radius="xl"/>
+  return <Avatar
+    src={avatarUrl}
+    alt="profile picture"
+    style={{alignSelf: "center"}}
+    size="lg"
+    radius="xl"
+    imageProps={{loading: "lazy"}}
+  />
 }
